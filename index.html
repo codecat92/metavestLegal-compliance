@@ -387,7 +387,7 @@ button { cursor: pointer; font-family: inherit; }
 <body>
 
 <header class="header">
-  <img src="Metavest-logo.png" alt="Metavest" class="header-logo" onerror="this.style.display='none'">
+  <img src="Metavest-logo.png" alt="Metavest" class="header-logo" id="headerLogo">
   <div class="header-titles">
     <h1 class="header-title">Dashboard Kepatuhan UU PDP - Metavest.id</h1>
     <p class="header-subtitle">Platform Social Trading &mdash; Integrasi MT5, Broker &amp; PAMM</p>
@@ -670,6 +670,8 @@ document.querySelectorAll(".filter-chip").forEach(chip => {
 document.addEventListener("keydown", function(e) {
   if (e.key === "Escape") closeModal();
 });
+
+(function(){ var l=document.getElementById("headerLogo"); if(l){ l.onerror=function(){l.style.display="none"}; } })();
 
 renderAll();
 </script>
