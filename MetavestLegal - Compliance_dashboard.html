@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Kepatuhan UU PDP — Metavest.id</title>
+<style>
+:root {
+  --bg: #1c1917;
+  --card-bg: #292524;
+  --text: #e7e5e4;
+  --text-secondary: #a8a29e;
+  --text-muted: #78716c;
+  --border: #44403c;
+  --border-light: #3d3937;
+  --accent: #f59e0b;
+  --accent-light: #78350f;
+  --accent-bg: #451a03;
+  --radius: 6px;
+  --radius-sm: 4px;
+  --pill-red-bg: #450a0a;
+  --pill-red-text: #fca5a5;
+  --pill-yellow-bg: #451a03;
+  --pill-yellow-text: #fcd34d;
+  --pill-green-bg: #052e16;
+  --pill-green-text: #86efac;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --transition: 0.15s ease;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; height: auto; display: block; }
+button { cursor: pointer; font-family: inherit; }
+.header {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.header-logo { height: 36px; width: auto; }
+.header-titles { display: flex; flex-direction: column; gap: 0; }
+.header-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.header-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.header-badge {
+  margin-left: auto;
+  background: var(--accent-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.filter-bar {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  position: sticky;
+  top: 77px;
+  z-index: 40;
+}
+.filter-label {
+  font-family: var(--font-serif);
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-right: 2px;
+  white-space: nowrap;
+}
+.filter-chip {
+  padding: 5px 12px;
+  border-radius: 14px;
+  font-size: 0.78rem;
+  font-weight: 400;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  transition: all var(--transition);
+  white-space: nowrap;
+  user-select: none;
+}
+.filter-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+.filter-chip.active { background: var(--text); color: #fff; border-color: var(--text); }
+.filter-chip.prioritas-merah.active { background: #ef4444; border-color: #ef4444; }
+.filter-chip.prioritas-kuning.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.filter-chip.prioritas-hijau.active { background: #22c55e; border-color: #22c55e; }
+.filter-chip.fase.active { background: var(--text); border-color: var(--text); }
+.search-wrap { margin-left: auto; position: relative; min-width: 220px; }
+.search-wrap svg {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  width: 15px; height: 15px; color: var(--text-muted); pointer-events: none;
+}
+.search-input {
+  width: 100%; padding: 6px 12px 6px 32px; border-radius: 14px;
+  border: 1px solid var(--border); font-size: 0.8rem; font-family: var(--font-sans);
+  background: var(--bg); color: var(--text); transition: all var(--transition); outline: none;
+}
+.search-input::placeholder { color: var(--text-muted); }
+.search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(245,158,11,.15); background: var(--card-bg); }
+.result-count { font-size: 0.76rem; color: var(--text-muted); white-space: nowrap; margin-left: 4px; }
+.main { max-width: 1040px; margin: 0 auto; padding: 32px 24px 64px; }
+.status-bar {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 20px; margin-bottom: 28px;
+  display: flex; flex-wrap: wrap; gap: 24px;
+}
+.status-item { display: flex; align-items: center; gap: 8px; font-size: 0.84rem; color: var(--text-secondary); }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; }
+.status-dot.merah { background: #ef4444; }
+.status-dot.kuning { background: var(--accent); }
+.status-dot.hijau { background: #22c55e; }
+.status-count { font-weight: 600; color: var(--text); }
+.section { margin-bottom: 6px; }
+.section-header {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 20px; display: flex;
+  align-items: center; gap: 12px; cursor: pointer; user-select: none;
+  transition: all var(--transition);
+}
+.section-header:hover { border-color: var(--accent); }
+.section-header.open {
+  border-radius: var(--radius) var(--radius) 0 0;
+  border-bottom-color: var(--border-light);
+  background: var(--accent-bg);
+  border-left: 3px solid var(--accent);
+  margin-left: -3px;
+  padding-left: 20px;
+}
+.section-header.open .section-num { background: var(--accent); color: #fff; }
+.section-header.open .section-chevron { color: var(--accent); }
+.section-header.open .section-count { color: var(--text-muted); }
+.section-num {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--border-light); color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-size: 0.85rem;
+  flex-shrink: 0; transition: all var(--transition);
+}
+.section-title {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  color: var(--text);
+  flex: 1;
+  letter-spacing: -0.01em;
+}
+.section-count { font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; }
+.section-chevron {
+  width: 16px; height: 16px; color: var(--text-muted);
+  transition: transform var(--transition); flex-shrink: 0;
+}
+.section-chevron.rotated { transform: rotate(180deg); }
+.section-body {
+  display: none; background: var(--card-bg); border: 1px solid var(--border);
+  border-top: 1px solid var(--border-light); border-radius: 0 0 var(--radius) var(--radius); padding: 20px;
+}
+.section-body.open { display: block; }
+.card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
+  cursor: pointer; transition: all var(--transition);
+  border-left: 3px solid transparent; display: flex; flex-direction: column; gap: 8px;
+}
+.card:hover { border-color: var(--accent); background: var(--card-bg); box-shadow: 0 1px 3px rgba(255,255,255,.04); }
+.card.merah { border-left-color: #ef4444; }
+.card.kuning { border-left-color: var(--accent); }
+.card.hijau { border-left-color: #22c55e; }
+.card.hidden { display: none; }
+.card-pasal {
+  font-family: var(--font-serif);
+  font-size: 0.88rem;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.card-ketentuan {
+  font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.card-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: auto; }
+.card-tag {
+  padding: 2px 8px; border-radius: 4px;
+  font-size: 0.68rem; font-weight: 500;
+}
+.card-tag.merah { background: var(--pill-red-bg); color: var(--pill-red-text); }
+.card-tag.kuning { background: var(--pill-yellow-bg); color: var(--pill-yellow-text); }
+.card-tag.hijau { background: var(--pill-green-bg); color: var(--pill-green-text); }
+.card-tag.fase { background: var(--accent-bg); color: var(--accent); }
+.empty-state { text-align: center; padding: 48px 24px; color: var(--text-muted); }
+.empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.3; }
+.empty-state p { font-size: 0.9rem; }
+.summary {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 28px 32px; margin-top: 32px;
+}
+.summary-title {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  color: var(--text);
+  margin-bottom: 18px;
+  letter-spacing: -0.01em;
+}
+.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.summary-card { border-radius: var(--radius); padding: 22px 16px; text-align: center; }
+.summary-card.merah { background: var(--pill-red-bg); }
+.summary-card.kuning { background: var(--pill-yellow-bg); }
+.summary-card.hijau { background: var(--pill-green-bg); }
+.summary-card-num { font-family: var(--font-serif); font-size: 2.4rem; color: var(--text); }
+.summary-card-label {
+  font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.4;
+}
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7);
+  z-index: 100; align-items: center; justify-content: center; padding: 24px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: var(--radius); max-width: 1120px; width: 100%; max-height: 85vh;
+  overflow-y: auto; box-shadow: 0 4px 24px rgba(0,0,0,.3);
+  animation: modalIn 0.15s ease-out;
+}
+@keyframes modalIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-header {
+  padding: 22px 24px 16px; display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 14px; border-bottom: 1px solid var(--border-light);
+  position: sticky; top: 0; background: var(--card-bg); z-index: 1;
+}
+.modal-close {
+  width: 30px; height: 30px; border-radius: 4px; border: 1px solid var(--border);
+  background: var(--card-bg); display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all var(--transition); color: var(--text-muted);
+}
+.modal-close:hover { border-color: var(--text-muted); color: var(--text); }
+.modal-pasal {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.modal-tags { display: flex; gap: 6px; margin-top: 8px; }
+.modal-tag {
+  padding: 3px 10px; border-radius: 4px;
+  font-size: 0.72rem; font-weight: 500;
+}
+.modal-tag.merah { background: var(--pill-red-bg); color: var(--pill-red-text); }
+.modal-tag.kuning { background: var(--pill-yellow-bg); color: var(--pill-yellow-text); }
+.modal-tag.hijau { background: var(--pill-green-bg); color: var(--pill-green-text); }
+.modal-tag.fase { background: var(--accent-bg); color: var(--accent); }
+.modal-body { padding: 20px 24px 24px; }
+.modal-block { margin-bottom: 22px; }
+.modal-block:last-child { margin-bottom: 0; }
+.modal-label {
+  font-family: var(--font-serif);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  letter-spacing: 0; text-transform: none;
+}
+.modal-ketentuan { font-size: 0.9rem; line-height: 1.7; color: var(--text); }
+.modal-langkah { list-style: none; padding: 0; }
+.modal-langkah li {
+  padding: 10px 14px; margin-bottom: 5px; background: var(--bg);
+  border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+  font-size: 0.86rem; line-height: 1.6; display: flex; gap: 8px; align-items: flex-start;
+}
+.modal-langkah li::before { content: "—"; color: var(--accent); flex-shrink: 0; }
+@media (max-width: 960px) {
+  .main { padding: 24px 16px 48px; max-width: 100%; }
+  .header { padding: 14px 18px; gap: 12px; }
+  .header-logo { height: 30px; }
+  .header-title { font-size: 1.1rem; }
+  .header-subtitle { font-size: 0.76rem; }
+  .header-badge { font-size: 0.7rem; padding: 3px 10px; }
+  .filter-bar { padding: 12px 18px; top: 60px; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .filter-label { font-size: 0.68rem; }
+  .filter-chip { padding: 5px 12px; font-size: 0.74rem; white-space: nowrap; flex-shrink: 0; }
+  .search-wrap { min-width: 180px; flex-shrink: 0; }
+  .card-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .summary-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .summary { padding: 20px 20px; }
+  .summary-card { padding: 18px 12px; }
+  .summary-card-num { font-size: 2rem; }
+}
+
+@media (max-width: 640px) {
+  .header { flex-wrap: wrap; gap: 6px; padding: 12px 16px; }
+  .header-logo { height: 28px; }
+  .header-title { font-size: 1rem; }
+  .header-subtitle { font-size: 0.72rem; }
+  .header-badge { margin-left: 0; }
+  .filter-bar { padding: 12px 16px; gap: 6px; position: sticky; top: 82px; flex-wrap: nowrap; }
+  .search-wrap { min-width: 130px; }
+  .search-input { font-size: 0.76rem; padding: 7px 10px 7px 30px; }
+  .result-count { font-size: 0.7rem; flex-shrink: 0; }
+  .main { padding: 20px 12px 40px; }
+  .status-bar { padding: 12px 16px; gap: 12px; flex-wrap: wrap; }
+  .status-item { font-size: 0.78rem; }
+  .card-grid { grid-template-columns: 1fr; gap: 8px; }
+  .card { padding: 14px 14px; min-height: 0; }
+  .card-pasal { font-size: 0.84rem; }
+  .card-ketentuan { font-size: 0.76rem; -webkit-line-clamp: 4; }
+  .card-tag { font-size: 0.66rem; padding: 2px 7px; }
+  .section-header { padding: 14px 16px; border-radius: var(--radius); }
+  .section-header.open { padding-left: 16px; margin-left: 0; border-left-width: 3px; }
+  .section-title { font-size: 0.88rem; }
+  .section-num { width: 28px; height: 28px; font-size: 0.78rem; }
+  .section-count { font-size: 0.72rem; }
+  .section-body { padding: 14px; }
+  .summary-grid { grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .summary { padding: 16px 16px; margin-top: 24px; }
+  .summary-title { font-size: 0.95rem; margin-bottom: 12px; }
+  .summary-card { padding: 14px 8px; }
+  .summary-card-num { font-size: 1.6rem; }
+  .summary-card-label { font-size: 0.7rem; }
+  .modal { max-width: 100%; max-height: 92vh; border-radius: var(--radius) var(--radius) 0 0; }
+  .modal-overlay { align-items: flex-end; padding: 0; }
+  .modal-header { padding: 18px 18px 14px; }
+  .modal-pasal { font-size: 1rem; }
+  .modal-body { padding: 16px 18px 24px; }
+  .modal-ketentuan { font-size: 0.84rem; line-height: 1.65; }
+  .modal-langkah li { padding: 10px 12px; font-size: 0.8rem; }
+  .modal-close { width: 34px; height: 34px; }
+  .modal-tag { font-size: 0.7rem; }
+}
+
+@media (max-width: 400px) {
+  .header-logo { height: 24px; }
+  .header-title { font-size: 0.92rem; }
+  .header-subtitle { display: none; }
+  .header-badge { display: none; }
+  .filter-bar { top: 56px; gap: 4px; }
+  .filter-label { display: none; }
+  .filter-chip { padding: 4px 10px; font-size: 0.7rem; }
+  .search-wrap { min-width: 100px; }
+  .search-input { font-size: 0.72rem; }
+  .summary-grid { grid-template-columns: 1fr; gap: 6px; }
+  .summary-card { display: flex; align-items: center; gap: 10px; padding: 12px 14px; text-align: left; }
+  .summary-card-num { font-size: 1.4rem; min-width: 32px; text-align: center; }
+  .summary-card-label { font-size: 0.72rem; margin-top: 0; }
+  .status-bar { gap: 8px; }
+  .status-item { font-size: 0.74rem; }
+  .modal-close { width: 36px; height: 36px; }
+}
+
+@media print {
+  .header, .filter-bar, .status-bar, .summary { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .section-header { break-inside: avoid; }
+  .card { break-inside: avoid; }
+  .section-body { display: block !important; }
+  .section-chevron { display: none; }
+  .modal-overlay { display: none !important; }
+  body { background: white; }
+  .main { padding: 0; max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <img src="Metavest-logo.png" alt="Metavest" class="header-logo" onerror="this.style.display='none'">
+  <div class="header-titles">
+    <h1 class="header-title">Dashboard Kepatuhan UU PDP - Metavest.id</h1>
+    <p class="header-subtitle">Platform Social Trading &mdash; Integrasi MT5, Broker &amp; PAMM</p>
+  </div>
+  <span class="header-badge">UU No. 27 Tahun 2022</span>
+</header>
+
+<div class="filter-bar" id="filterBar">
+  <span class="filter-label">Prioritas</span>
+  <button class="filter-chip prioritas-merah active" data-filter="merah" data-group="prioritas">Wajib</button>
+  <button class="filter-chip prioritas-kuning active" data-filter="kuning" data-group="prioritas">Phase 2</button>
+  <button class="filter-chip prioritas-hijau active" data-filter="hijau" data-group="prioritas">Best Practice</button>
+  <span class="filter-label" style="margin-left:8px">Fase</span>
+  <button class="filter-chip fase active" data-filter="DEV" data-group="fase">DEV</button>
+  <button class="filter-chip fase active" data-filter="PRE-LAUNCH" data-group="fase">PRE-LAUNCH</button>
+  <button class="filter-chip fase active" data-filter="LIVE" data-group="fase">LIVE</button>
+  <button class="filter-chip fase active" data-filter="INCIDENT" data-group="fase">INCIDENT</button>
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" class="search-input" id="searchInput" placeholder="Cari pasal, ketentuan...">
+  </div>
+  <span class="result-count" id="resultCount"></span>
+</div>
+
+<main class="main">
+  <div class="status-bar" id="statusBar"></div>
+  <div id="sectionsContainer"></div>
+  <div class="summary" id="summarySection"></div>
+</main>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal" role="dialog" aria-modal="true"></div>
+</div>
+<script>
+const DATA = [
+  { s:1, st:"Consent & Dasar Pemrosesan Data", p:"Pasal 20 ayat (2) huruf a", k:"Dasar pemrosesan data harus persetujuan eksplisit dari pengguna", l:["Buat halaman onboarding dengan checkbox terpisah per tujuan pemrosesan","Hindari satu checkbox \"Setuju S&K\" — pisahkan berdasarkan tujuan spesifik"], ik:"🔴", fk:"merah", fe:"DEV" },
+  { s:1, st:"Consent & Dasar Pemrosesan Data", p:"Pasal 22 ayat (1)-(3)", k:"Persetujuan wajib tertulis atau terekam, berkekuatan hukum sama baik elektronik maupun non-elektronik", l:["Simpan setiap consent ke tabel user_consents","Kolom minimal: user_id, consent_type, version_kebijakan, timestamp, ip_address, status (granted/revoked)"], ik:"🔴", fk:"merah", fe:"DEV" },
+  { s:1, st:"Consent & Dasar Pemrosesan Data", p:"Pasal 22 ayat (4)", k:"Jika consent memuat tujuan lain, harus dibedakan jelas, format mudah dipahami, dan bahasa sederhana", l:["Pisahkan consent minimal 3 jenis: (1) koneksi MT5 read-only, (2) tampil di dashboard pribadi, (3) share ke signal feed publik/PAMM"], ik:"🔴", fk:"merah", fe:"DEV" },
+  { s:1, st:"Consent & Dasar Pemrosesan Data", p:"Pasal 22 ayat (5)", k:"Consent yang tidak memenuhi syarat di atas batal demi hukum", l:["Legal/QA review teks consent sebelum launch","Pastikan tidak ada praktik bundling consent (semua consent dipaketkan jadi satu tanpa opsi pisah)"], ik:"🔴", fk:"merah", fe:"PRE-LAUNCH" },
+  { s:1, st:"Consent & Dasar Pemrosesan Data", p:"Pasal 21", k:"Wajib menyampaikan informasi: legalitas, tujuan, jenis data, retensi, durasi, hak subjek data — sebelum consent diminta", l:["Buat halaman \"Informasi Pemrosesan Data\" yang wajib dibaca atau di-scroll sebelum tombol consent aktif","Informasi harus lengkap dan transparan sebelum user memberikan persetujuan"], ik:"🔴", fk:"merah", fe:"DEV" },
+  { s:1, st:"Consent & Dasar Pemrosesan Data", p:"Pasal 21 ayat (2)", k:"Jika ada perubahan tujuan atau kebijakan, wajib memberitahu pengguna sebelum perubahan berlaku", l:["Bangun sistem notifikasi in-app dan email untuk perubahan kebijakan privasi","Sediakan re-consent flow jika perubahan signifikan"], ik:"🟡", fk:"kuning", fe:"LIVE" },
+  { s:1, st:"Consent & Dasar Pemrosesan Data", p:"Pasal 24", k:"Pengendali data wajib bisa menunjukkan bukti consent yang telah diberikan", l:["Buat admin panel untuk export riwayat consent per user","Data harus siap untuk keperluan audit atau permintaan regulator"], ik:"🔴", fk:"merah", fe:"LIVE" },
+  { s:1, st:"Consent & Dasar Pemrosesan Data", p:"Pasal 9", k:"Pengguna berhak menarik kembali persetujuan kapan saja", l:["Buat toggle di setting profil: \"Cabut izin share ke signal feed\"","Buat mekanisme \"Putuskan koneksi MT5\" yang mudah diakses"], ik:"🔴", fk:"merah", fe:"DEV" },
+  { s:1, st:"Consent & Dasar Pemrosesan Data", p:"Pasal 40", k:"Setelah penarikan consent, pemrosesan wajib dihentikan maksimal 3x24 jam", l:["Buat job atau queue otomatis yang trigger stop-processing begitu status consent berubah menjadi revoked","Proses harus otomatis — tidak boleh mengandalkan proses manual"], ik:"🔴", fk:"merah", fe:"DEV" },
+  { s:2, st:"Data Spesifik & Penilaian Risiko (DPIA)", p:"Pasal 4 ayat (2) huruf f", k:"Data keuangan pribadi (saldo, P/L, posisi trading) termasuk Data Pribadi spesifik", l:["Tandai kolom terkait (balance, equity, open positions, transaction history) sebagai sensitive field di schema database","Terapkan level enkripsi dan kontrol akses yang berbeda dari data umum (nama, email)"], ik:"🔴", fk:"merah", fe:"DEV" },
+  { s:2, st:"Data Spesifik & Penilaian Risiko (DPIA)", p:"Pasal 34 ayat (1)-(2)", k:"Wajib melakukan DPIA jika pemrosesan berisiko tinggi: data spesifik, skala besar, profiling otomatis, atau teknologi baru", l:["Susun dokumen DPIA internal sebelum launch","Identifikasi risiko: kebocoran saldo, penyalahgunaan signal, dsb.","Dokumentasikan mitigasi — tidak perlu format resmi (PP belum terbit), cukup terdokumentasi dan bisa ditunjukkan"], ik:"🔴", fk:"merah", fe:"PRE-LAUNCH" },
+  { s:2, st:"Data Spesifik & Penilaian Risiko (DPIA)", p:"Pasal 34 ayat (2) huruf d", k:"Auto-signal generation (mendeteksi posisi baru otomatis) termasuk pemantauan sistematis yang berisiko tinggi", l:["Saat membangun fitur auto-signal di Phase 2, masukkan ke DPIA sebagai item risiko baru sebelum fitur live","Evaluasi ulang tingkat risiko dan mitigasi yang diperlukan"], ik:"🟡", fk:"kuning", fe:"DEV" },
+  { s:2, st:"Data Spesifik & Penilaian Risiko (DPIA)", p:"Pasal 4 ayat (3) huruf f", k:"Data yang dikombinasikan untuk identifikasi (nomor telepon, IP address) juga termasuk Data Pribadi", l:["Pastikan IP address dan device fingerprint yang disimpan untuk fraud detection masuk dalam kebijakan retensi dan consent yang sama"], ik:"🟡", fk:"kuning", fe:"DEV" },
+  { s:3, st:"Keamanan Teknis Data", p:"Pasal 35 huruf a", k:"Wajib mengambil langkah teknis operasional untuk melindungi data dari gangguan pemrosesan", l:["Terapkan enkripsi at-rest untuk kolom sensitif (investor password MT5, data saldo)","Gunakan AES-256 atau setara — tidak boleh menyimpan dalam bentuk plaintext di database"], ik:"🔴", fk:"merah", fe:"DEV" },
+  { s:3, st:"Keamanan Teknis Data", p:"Pasal 35 huruf b", k:"Tingkat keamanan harus disesuaikan dengan sifat dan risiko data", l:["Investor password MT5 = risiko tinggi → simpan di secrets manager (HashiCorp Vault atau AWS Secrets Manager)","Jangan simpan di kolom biasa dalam tabel mt5_accounts"], ik:"🔴", fk:"merah", fe:"DEV" },
+  { s:3, st:"Keamanan Teknis Data", p:"Pasal 36", k:"Wajib menjaga kerahasiaan data pribadi", l:["Terapkan role-based access control (RBAC)","Admin support tidak boleh bisa melihat investor password mentah","Hanya sistem yang bisa decrypt saat terhubung ke MT5 bridge"], ik:"🔴", fk:"merah", fe:"DEV" },
+  { s:3, st:"Keamanan Teknis Data", p:"Pasal 37", k:"Wajib mengawasi semua pihak yang terlibat dalam pemrosesan data", l:["Buat audit log untuk setiap akses ke data sensitif","Catat: siapa mengakses data siapa, kapan","Termasuk akses dari tim internal dan support"], ik:"🟡", fk:"kuning", fe:"LIVE" },
+  { s:3, st:"Keamanan Teknis Data", p:"Pasal 38-39", k:"Wajib mencegah akses tidak sah dan memproses data melalui sistem elektronik yang andal, aman, dan bertanggung jawab", l:["Terapkan TLS 1.2+ untuk semua komunikasi (Laravel API ↔ Python bridge ↔ MT5)","Aktifkan MFA untuk akun admin dan special user","Pasang rate limiting dan WAF di API endpoint","Jalankan vulnerability scanning secara berkala"], ik:"🔴", fk:"merah", fe:"DEV" },
+  { s:3, st:"Keamanan Teknis Data", p:"Pasal 39 — VPS Bridge", k:"Sistem elektronik pada VPS Windows tempat MT5 Python bridge berjalan harus aman", l:["Pasang firewall ketat — hanya port yang diperlukan yang terbuka","Disable RDP publik","Jalankan patch OS secara rutin"], ik:"🔴", fk:"merah", fe:"DEV" },
+  { s:3, st:"Keamanan Teknis Data", p:"Pasal 31", k:"Wajib merekam seluruh kegiatan pemrosesan data (setara ROPA — Record of Processing Activities)", l:["Buat dokumen internal ROPA","Daftar semua tempat data pribadi diproses: tabel database, file log, cache, third-party API"], ik:"🟡", fk:"kuning", fe:"PRE-LAUNCH" },
+  { s:4, st:"Hak Subjek Data & SLA Teknis", p:"Pasal 7", k:"Pengguna berhak mengakses dan memperoleh salinan data pribadinya", l:["Buat endpoint GET /api/user/my-data/export","Generate dalam format JSON atau PDF berisi seluruh data pribadi pengguna"], ik:"🟡", fk:"kuning", fe:"DEV" },
+  { s:4, st:"Hak Subjek Data & SLA Teknis", p:"Pasal 32 ayat (2)", k:"Akses data wajib diberikan maksimal 3x24 jam sejak diminta", l:["Jika belum bisa full-automated, minimal buat tiket otomatis ke admin dengan SLA countdown 72 jam","Prioritaskan otomatisasi penuh untuk memenuhi SLA"], ik:"🟡", fk:"kuning", fe:"DEV" },
+  { s:4, st:"Hak Subjek Data & SLA Teknis", p:"Pasal 6, 30", k:"Pengguna berhak melakukan koreksi data — wajib diperbaiki maksimal 3x24 jam", l:["Buat fitur edit profil self-service untuk data umum","Untuk data yang butuh verifikasi, buat request queue dengan SLA 72 jam"], ik:"🟡", fk:"kuning", fe:"DEV" },
+  { s:4, st:"Hak Subjek Data & SLA Teknis", p:"Pasal 8, 43", k:"Pengguna berhak meminta penghapusan data — wajib dihapus jika diminta", l:["Buat endpoint \"Delete Account\"","Lakukan hard delete atau anonymize data pribadi","Sesuaikan dengan kewajiban retensi lain (misal data transaksi untuk audit keuangan)"], ik:"🔴", fk:"merah", fe:"DEV" },
+  { s:4, st:"Hak Subjek Data & SLA Teknis", p:"Pasal 13", k:"Pengguna berhak memperoleh data dalam format yang bisa dibaca sistem lain (portabilitas)", l:["Export dalam format terstruktur (JSON/CSV)","Jangan hanya screenshot atau PDF read-only saja"], ik:"🟢", fk:"hijau", fe:"DEV" },
+  { s:4, st:"Hak Subjek Data & SLA Teknis", p:"Pasal 14", k:"Pelaksanaan hak pengguna diajukan melalui permohonan yang tercatat", l:["Semua request (akses/hapus/koreksi) harus melalui sistem yang tercatat","Bukan melalui chat WhatsApp informal","Gunakan in-app request form + ticket ID"], ik:"🟡", fk:"kuning", fe:"DEV" },
+  { s:5, st:"Kegagalan Perlindungan Data (Data Breach)", p:"Pasal 46 ayat (1)", k:"Wajib notifikasi tertulis maksimal 3x24 jam ke pengguna dan lembaga (saat ini: Kemkomdigi)", l:["Siapkan incident response playbook","Template notifikasi siap pakai","Kontak Kemkomdigi untuk pelaporan","Eskalasi internal yang jelas"], ik:"🔴", fk:"merah", fe:"INCIDENT" },
+  { s:5, st:"Kegagalan Perlindungan Data (Data Breach)", p:"Pasal 46 ayat (2)", k:"Notifikasi minimal memuat: data yang bocor, kapan/bagaimana bocor, dan upaya pemulihan", l:["Siapkan template pre-drafted agar tidak menyusun dari nol saat panik","Isi tinggal disesuaikan dengan detail insiden yang terjadi"], ik:"🔴", fk:"merah", fe:"INCIDENT" },
+  { s:5, st:"Kegagalan Perlindungan Data (Data Breach)", p:"Pasal 46 ayat (3)", k:"Dalam hal tertentu wajib memberitahu masyarakat luas tentang insiden yang terjadi", l:["Tentukan threshold internal: breach di atas berapa user → wajib pengumuman publik","Siapkan channel pengumuman: blog, press release"], ik:"🟡", fk:"kuning", fe:"INCIDENT" },
+  { s:5, st:"Kegagalan Perlindungan Data (Data Breach)", p:"Best Practice", k:"Deteksi dini insiden melalui sistem monitoring dan alerting (praktik terbaik)", l:["Setup monitoring/alerting: anomaly detection untuk akses data massal","Deteksi failed login spike","Agar breach terdeteksi cepat, bukan setelah berbulan-bulan"], ik:"🟢", fk:"hijau", fe:"DEV" },
+  { s:6, st:"Transfer Data ke Pihak Ketiga", p:"Pasal 16 ayat (1) huruf e", k:"Transfer atau penyebarluasan data merupakan bagian dari pemrosesan yang diatur UU", l:["Setiap fitur baru yang mengirim data keluar sistem (share ke broker/PAMM/follower) wajib cek ulang consent flow (lihat Bagian 1)"], ik:"🔴", fk:"merah", fe:"DEV" },
+  { s:6, st:"Transfer Data ke Pihak Ketiga", p:"Pasal 55", k:"Transfer dalam wilayah hukum RI — kedua pihak wajib tetap menerapkan perlindungan sesuai UU ini", l:["Jika integrasi dengan broker lokal/PAMM lokal, buat Data Processing Agreement (DPA)","Pastikan kontrak menyatakan mereka juga menerapkan standar perlindungan yang sama"], ik:"🟡", fk:"kuning", fe:"DEV" },
+  { s:6, st:"Transfer Data ke Pihak Ketiga", p:"Pasal 56 ayat (2)-(4)", k:"Transfer ke luar negeri — wajib pastikan negara tujuan setara atau memiliki binding safeguard", l:["Dokumentasikan lokasi hosting semua mitra (broker asing, Pusher jika bukan self-hosted, dsb.)","Jika tidak yakin level perlindungannya setara → minta consent eksplisit tambahan khusus untuk transfer lintas negara"], ik:"🔴", fk:"merah", fe:"PRE-LAUNCH" },
+  { s:6, st:"Transfer Data ke Pihak Ketiga", p:"Pasal 65 ayat (2)", k:"Larangan mengungkapkan data secara melawan hukum — ancaman pidana hingga 4 tahun", l:["Terapkan anonimisasi/agregasi untuk signal feed publik","Tampilkan username/alias, bukan nama asli","Kecuali user secara eksplisit setuju identitas penuh ditampilkan"], ik:"🟡", fk:"kuning", fe:"DEV" },
+  { s:7, st:"Data Anak & Penyandang Disabilitas", p:"Pasal 25", k:"Pemrosesan data anak wajib mendapatkan persetujuan orang tua atau wali", l:["Tambahkan age-gate di registrasi (platform trading umumnya sudah exclude di bawah 18)","Pastikan eksplisit di T&C + validasi umur"], ik:"🟢", fk:"hijau", fe:"DEV" },
+  { s:8, st:"Retensi & Penghapusan Data", p:"Pasal 16 ayat (2) huruf g", k:"Data wajib dihapus atau dimusnahkan setelah masa retensi berakhir", l:["Definisikan retention policy per jenis data: investor password (hapus segera saat disconnect)","Data transaksi (retensi sesuai kewajiban pajak/OJK jika ada)","Log akses (misal 1-2 tahun)"], ik:"🟡", fk:"kuning", fe:"DEV" },
+  { s:8, st:"Retensi & Penghapusan Data", p:"Pasal 44", k:"Wajib musnahkan data jika sudah habis masa retensi dan tidak terkait proses hukum", l:["Buat scheduled job (cron) untuk purge data sesuai retention policy","Pastikan proses berjalan otomatis dan terdokumentasi"], ik:"🟡", fk:"kuning", fe:"LIVE" },
+  { s:9, st:"Governance & Kelembagaan Internal", p:"Pasal 53", k:"Wajib menunjuk petugas Pelindungan Data Pribadi (DPO-like) untuk layanan skala besar atau data spesifik", l:["Untuk startup kecil, cukup tunjuk 1 orang (bisa founder/CTO di awal) sebagai penanggung jawab compliance data","Formalkan peran saat tim bertambah besar"], ik:"🟡", fk:"kuning", fe:"PRE-LAUNCH" },
+  { s:9, st:"Governance & Kelembagaan Internal", p:"Pasal 54", k:"Tugas petugas: memberi informasi & saran ke pengendali, memantau kepatuhan, DPIA, menjadi narahubung", l:["Petugas ini yang bertanggung jawab meng-update dokumen compliance secara berkala","Jadi narahubung untuk pertanyaan terkait perlindungan data"], ik:"🟡", fk:"kuning", fe:"LIVE" }
+];
+
+const SECTION_TITLES = {
+  1: "Consent & Dasar Pemrosesan Data",
+  2: "Data Spesifik & Penilaian Risiko (DPIA)",
+  3: "Keamanan Teknis Data",
+  4: "Hak Subjek Data & SLA Teknis",
+  5: "Kegagalan Perlindungan Data (Data Breach)",
+  6: "Transfer Data ke Pihak Ketiga",
+  7: "Data Anak & Penyandang Disabilitas",
+  8: "Retensi & Penghapusan Data",
+  9: "Governance & Kelembagaan Internal"
+};
+
+const PRIORITAS_LABEL = { merah: "Wajib", kuning: "Phase 2", hijau: "Best Practice" };
+const FASE_LABEL = { "DEV": "DEV", "PRE-LAUNCH": "PRE-LAUNCH", "LIVE": "LIVE", "INCIDENT": "INCIDENT" };
+
+let activePrioritas = new Set(["merah", "kuning", "hijau"]);
+let activeFase = new Set(["DEV", "PRE-LAUNCH", "LIVE", "INCIDENT"]);
+let searchQuery = "";
+
+function filterItems() {
+  return DATA.filter(d =>
+    activePrioritas.has(d.fk) &&
+    activeFase.has(d.fe) &&
+    (!searchQuery || d.p.toLowerCase().includes(searchQuery) || d.k.toLowerCase().includes(searchQuery) || d.l.some(li => li.toLowerCase().includes(searchQuery)))
+  );
+}
+
+function renderAll() {
+  const filtered = filterItems();
+  const grouped = {};
+  filtered.forEach(d => {
+    if (!grouped[d.s]) grouped[d.s] = [];
+    grouped[d.s].push(d);
+  });
+
+  const sectionsContainer = document.getElementById("sectionsContainer");
+  sectionsContainer.innerHTML = "";
+
+  Object.keys(grouped).sort((a,b) => a-b).forEach(sNum => {
+    const items = grouped[sNum];
+    const title = SECTION_TITLES[sNum] || "Section " + sNum;
+    const sectionEl = document.createElement("div");
+    sectionEl.className = "section";
+    sectionEl.innerHTML = `
+      <div class="section-header" data-section="${sNum}">
+        <span class="section-num">${sNum}</span>
+        <span class="section-title">${title}</span>
+        <span class="section-count">${items.length} pasal</span>
+        <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="section-body" data-section-body="${sNum}">
+        <div class="card-grid">
+          ${items.map(d => `
+            <div class="card ${d.fk}" data-idx="${DATA.indexOf(d)}">
+              <div class="card-pasal">${d.p}</div>
+              <div class="card-ketentuan">${d.k}</div>
+              <div class="card-tags">
+                <span class="card-tag ${d.fk}">${PRIORITAS_LABEL[d.fk]}</span>
+                <span class="card-tag fase">${d.fe}</span>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+    sectionsContainer.appendChild(sectionEl);
+  });
+
+  document.querySelectorAll(".card").forEach(card => {
+    card.addEventListener("click", () => {
+      const idx = parseInt(card.dataset.idx);
+      if (!isNaN(idx) && DATA[idx]) openModal(DATA[idx]);
+    });
+  });
+
+  document.querySelectorAll(".section-header").forEach(header => {
+    header.addEventListener("click", () => toggleSection(header.dataset.section));
+  });
+
+  updateCounts(filtered);
+}
+
+function updateCounts(filtered) {
+  const total = DATA.length;
+  const shown = filtered.length;
+  document.getElementById("resultCount").textContent = shown < total ? `Menampilkan ${shown} dari ${total} pasal` : "";
+
+  const m = filtered.filter(d => d.fk === "merah").length;
+  const k = filtered.filter(d => d.fk === "kuning").length;
+  const h = filtered.filter(d => d.fk === "hijau").length;
+  document.getElementById("statusBar").innerHTML = `
+    <div class="status-item"><span class="status-dot merah"></span> <span class="status-count">${m}</span> Wajib</div>
+    <div class="status-item"><span class="status-dot kuning"></span> <span class="status-count">${k}</span> Phase 2</div>
+    <div class="status-item"><span class="status-dot hijau"></span> <span class="status-count">${h}</span> Best Practice</div>
+  `;
+
+  document.getElementById("summarySection").innerHTML = `
+    <div class="summary-title">Ringkasan Prioritas</div>
+    <div class="summary-grid">
+      <div class="summary-card merah">
+        <div class="summary-card-num">${DATA.filter(d=>d.fk==="merah").length}</div>
+        <div class="summary-card-label">Wajib sebelum launch</div>
+      </div>
+      <div class="summary-card kuning">
+        <div class="summary-card-num">${DATA.filter(d=>d.fk==="kuning").length}</div>
+        <div class="summary-card-label">Menyusul Phase 2-3</div>
+      </div>
+      <div class="summary-card hijau">
+        <div class="summary-card-num">${DATA.filter(d=>d.fk==="hijau").length}</div>
+        <div class="summary-card-label">Best Practice</div>
+      </div>
+    </div>
+  `;
+}
+
+function toggleSection(sNum) {
+  const header = document.querySelector(`.section-header[data-section="${sNum}"]`);
+  const body = document.querySelector(`[data-section-body="${sNum}"]`);
+  const chevron = header.querySelector(".section-chevron");
+  const isOpen = body.classList.contains("open");
+
+  document.querySelectorAll(".section-header.open").forEach(h => {
+    if (h !== header) {
+      h.classList.remove("open");
+      h.querySelector(".section-chevron").classList.remove("rotated");
+    }
+  });
+  document.querySelectorAll(".section-body.open").forEach(b => {
+    if (b !== body) b.classList.remove("open");
+  });
+
+  if (isOpen) {
+    header.classList.remove("open");
+    body.classList.remove("open");
+    chevron.classList.remove("rotated");
+  } else {
+    header.classList.add("open");
+    body.classList.add("open");
+    chevron.classList.add("rotated");
+  }
+}
+
+function openModal(d) {
+  document.getElementById("modal").innerHTML = `
+    <div class="modal-header">
+      <div>
+        <div class="modal-pasal">${d.p}</div>
+        <div class="modal-tags">
+          <span class="modal-tag ${d.fk}">${PRIORITAS_LABEL[d.fk]}</span>
+          <span class="modal-tag fase">${d.fe}</span>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-block">
+        <div class="modal-label">Ketentuan UU</div>
+        <div class="modal-ketentuan">${d.k}</div>
+      </div>
+      <div class="modal-block">
+        <div class="modal-label">Langkah Eksekusi / Planning</div>
+        <ul class="modal-langkah">
+          ${d.l.map(li => `<li>${li}</li>`).join("")}
+        </ul>
+      </div>
+    </div>
+  `;
+  document.getElementById("modalOverlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+  document.getElementById("modalOverlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+document.getElementById("modalOverlay").addEventListener("click", function(e) {
+  if (e.target === this) closeModal();
+});
+
+document.getElementById("searchInput").addEventListener("input", function() {
+  searchQuery = this.value.toLowerCase().trim();
+  renderAll();
+});
+
+document.querySelectorAll(".filter-chip").forEach(chip => {
+  chip.addEventListener("click", function() {
+    this.classList.toggle("active");
+    const group = this.dataset.group;
+    const filter = this.dataset.filter;
+    if (group === "prioritas") {
+      if (this.classList.contains("active")) activePrioritas.add(filter);
+      else activePrioritas.delete(filter);
+    } else if (group === "fase") {
+      if (this.classList.contains("active")) activeFase.add(filter);
+      else activeFase.delete(filter);
+    }
+    renderAll();
+  });
+});
+
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") closeModal();
+});
+
+renderAll();
+</script>
+</body>
+</html>
